@@ -1,3 +1,14 @@
 [build]
-  command = "unzip -o \"AFRIBOLT WINDSURF-20260115T093212Z-3-001.zip\" && cd \"AFRIBOLT WINDSURF/frontend\" && npm install && npm run build"
-  publish = "AFRIBOLT WINDSURF/frontend/.next"
+  base = "frontend"
+  command = "npm install && npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "18"
+  NEXT_PUBLIC_API_URL = "https://api.afribolt.com"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://api.afribolt.com/api/:splat"
+  status = 200
+  force = true
