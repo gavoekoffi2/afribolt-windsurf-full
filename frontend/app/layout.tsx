@@ -1,8 +1,5 @@
 import "./globals.css";
-import { Inter } from "next/font/google";
 import { Providers } from "./providers";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "AFRIBOLT - Plateforme AI Multi-Agents",
@@ -18,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={inter.className}>
-      <body className="bg-gray-50 text-gray-900">
+    <html lang="fr">
+      <body className="bg-gray-50 text-gray-900 font-sans">
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -50,7 +50,15 @@ export default function Dashboard() {
     }
   ];
 
-  const recentProjects = [
+  const recentProjects: Array<{
+    id: string;
+    name: string;
+    description: string;
+    status: "active" | "planning" | "completed";
+    lastActivity: string;
+    agents: string[];
+    progress: number;
+  }> = [
     {
       id: "1",
       name: "E-commerce Platform",
@@ -80,7 +88,13 @@ export default function Dashboard() {
     }
   ];
 
-  const agents = [
+  const agents: Array<{
+    name: string;
+    role: string;
+    status: "active" | "idle" | "busy";
+    lastMessage: string;
+    color: string;
+  }> = [
     {
       name: "EMEFA",
       role: "Team Lead AI",
