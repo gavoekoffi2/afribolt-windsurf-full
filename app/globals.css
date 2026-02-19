@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-afribolt-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-afribolt-700 transition-colors duration-200 shadow-lg hover:shadow-xl;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-100 text-gray-900 px-6 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors duration-200;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-afribolt-500 focus:border-transparent outline-none transition-all duration-200;
+  }
+
+  .gradient-bg {
+    background: linear-gradient(135deg, #f37320 0%, #e45a16 100%);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, #f37320 0%, #e45a16 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #f37320;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e45a16;
+}
+
+/* Agent avatars */
+.agent-emefa { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.agent-koffi { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.agent-dede { background: linear-gradient(135deg, #10b981, #059669); }
+.agent-solim { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.agent-akofa { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.agent-kwami { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+.agent-yaovi { background: linear-gradient(135deg, #ec4899, #db2777); }

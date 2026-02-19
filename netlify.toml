@@ -1,3 +1,13 @@
 [build]
-  command = "unzip -o \"AFRIBOLT WINDSURF-20260115T093212Z-3-001.zip\" && cd \"AFRIBOLT WINDSURF/frontend\" && npm install && npm run build"
-  publish = "AFRIBOLT WINDSURF/frontend/.next"
+  command = "npm install && npm run build"
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Netlify automatically serves .html files without extensions (pretty URLs)
+# Fallback: serve 404 page for unknown routes
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
