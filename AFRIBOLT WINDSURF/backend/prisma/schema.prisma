@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  googleId  String?  @unique
+  password  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects     Project[]
+  agentConfigs AgentConfig[]
+  sessions     Session[]
+
+  @@map("users")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      String   @default("active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  agents     Agent[]
+  sessions   Session[]
+  histories  History[]
+
+  @@map("projects")
+}
+
+model Agent {
+  id          String   @id @default(cuid())
+  name        String
+  type        String
+  status      String   @default("idle")
+  config      Json?
+  lastActive  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  histories History[]
+
+  @@map("agents")
+}
+
+model AgentConfig {
+  id           String @id @default(cuid())
+  agentType    String
+  model        String
+  temperature  Float  @default(0.7)
+  maxTokens    Int    @default(2000)
+  systemPrompt String
+  apiKey       String?
+  
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("agent_configs")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  title     String
+  messages  Json[]
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model History {
+  id        String   @id @default(cuid())
+  type      String
+  content   Json
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  agentId   String
+  agent     Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("histories")
+}
