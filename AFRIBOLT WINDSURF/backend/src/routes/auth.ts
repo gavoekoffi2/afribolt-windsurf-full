@@ -1,14 +1,14 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
 import { OAuth2Client } from "google-auth-library";
+import { Database } from "../config/database";
 import { createError } from "../middleware/errorHandler";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { validateAuth } from "../middleware/validation";
 
 const router = express.Router();
-const prisma = new PrismaClient();
+const prisma = Database.getInstance();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 router.post("/register", validateAuth, async (req, res, next) => {

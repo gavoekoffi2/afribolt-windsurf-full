@@ -27,6 +27,11 @@ export default function RegisterPage() {
       return;
     }
 
+    if (formData.password.length < 6) {
+      toast.error("Le mot de passe doit contenir au moins 6 caractères");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -35,12 +40,16 @@ export default function RegisterPage() {
         email: formData.email,
         password: formData.password,
       });
-      
-      localStorage.setItem("afribolt_token", response.data.data.token);
+
+      const token = response.data?.data?.token || response.data?.token;
+      if (token) {
+        localStorage.setItem("afribolt_token", token);
+      }
       toast.success("Compte créé avec succès!");
       router.push("/dashboard");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Erreur d'inscription");
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { error?: { message?: string }; message?: string } } };
+      toast.error(axiosError.response?.data?.error?.message || axiosError.response?.data?.message || "Erreur d'inscription");
     } finally {
       setIsLoading(false);
     }
@@ -172,15 +181,15 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-gray-500 text-center">
             En créant un compte, vous acceptez nos{" "}
-            <Link href="/terms" className="text-afribolt-600 hover:text-afribolt-500">
-              conditions d'utilisation
-            </Link>{" "}
+            <span className="text-afribolt-600">
+              conditions d&apos;utilisation
+            </span>{" "}
             et notre{" "}
-            <Link href="/privacy" className="text-afribolt-600 hover:text-afribolt-500">
+            <span className="text-afribolt-600">
               politique de confidentialité
-            </Link>
+            </span>
           </div>
         </motion.form>
       </motion.div>

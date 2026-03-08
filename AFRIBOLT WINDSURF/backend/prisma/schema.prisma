@@ -98,10 +98,10 @@ model History {
   metadata  Json?
   createdAt DateTime @default(now())
 
-  agentId   String
-  agent     Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  projectId String
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  agentId   String?
+  agent     Agent?   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@map("histories")
 }

@@ -1,11 +1,11 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { validateProject } from "../middleware/validation";
 import { createError } from "../middleware/errorHandler";
+import { Database } from "../config/database";
 
 const router = express.Router();
-const prisma = new PrismaClient();
+const prisma = Database.getInstance();
 
 router.get("/", authenticate, async (req: AuthRequest, res, next) => {
   try {

@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { 
-  GithubIcon,
-  TwitterIcon,
-  LinkedinIcon,
-  MailIcon
+import {
+  Github,
+  Twitter,
+  Linkedin,
+  Mail
 } from "lucide-react";
 
 const navigation = {
@@ -36,10 +36,10 @@ const navigation = {
 };
 
 const socialLinks = [
-  { name: "Twitter", href: "#", icon: TwitterIcon },
-  { name: "GitHub", href: "#", icon: GithubIcon },
-  { name: "LinkedIn", href: "#", icon: LinkedinIcon },
-  { name: "Email", href: "mailto:contact@afribolt.com", icon: MailIcon }
+  { name: "Twitter", href: "#", icon: Twitter },
+  { name: "GitHub", href: "#", icon: Github },
+  { name: "LinkedIn", href: "#", icon: Linkedin },
+  { name: "Email", href: "mailto:contact@afribolt.com", icon: Mail }
 ];
 
 export function Footer() {
@@ -141,7 +141,7 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © 2024 AFRIBOLT. Tous droits réservés. Fait avec ❤️ en Afrique.
+              © {new Date().getFullYear()} AFRIBOLT. Tous droits réservés. Fait avec ❤️ en Afrique.
             </p>
             <div className="mt-4 md:mt-0 flex items-center space-x-6">
               <span className="text-gray-400 text-sm">

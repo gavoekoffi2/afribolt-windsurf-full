@@ -5,7 +5,6 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { PrismaClient } from "@prisma/client";
 import { authRoutes } from "./routes/auth";
 import { projectRoutes } from "./routes/projects";
 import { agentRoutes } from "./routes/agents";
@@ -16,23 +15,39 @@ import { errorHandler } from "./middleware/errorHandler";
 import { rateLimiter } from "./middleware/rateLimiter";
 import { logger } from "./utils/logger";
 import { AgentOrchestrator } from "./agents/orchestrator";
+import { Database } from "./config/database";
 
 dotenv.config();
 
+// Validate required environment variables
+const requiredEnvVars = ["JWT_SECRET", "DATABASE_URL"];
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    logger.error(`Missing required environment variable: ${envVar}`);
+    process.exit(1);
+  }
+}
+
 const app = express();
 const server = createServer(app);
+const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: frontendUrl,
     methods: ["GET", "POST"]
   }
 });
 
-const prisma = new PrismaClient();
+// Use the Database singleton instead of creating a duplicate PrismaClient
+const prisma = Database.getInstance();
 const PORT = process.env.PORT || 3001;
 
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: frontendUrl,
+  credentials: true,
+}));
 app.use(morgan("combined"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -45,18 +60,18 @@ app.use("/api/llm", llmRoutes);
 app.use("/api/health", healthRoutes);
 app.use("/api/deepcode", deepcodeRoutes);
 
-app.get("/health", (req, res) => {
+app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 app.use(errorHandler);
 
-const agentOrchestrator = new AgentOrchestrator(io, prisma);
+let agentOrchestrator: AgentOrchestrator;
 
 io.on("connection", (socket) => {
   logger.info(`Client connected: ${socket.id}`);
-  
-  socket.on("join-project", (projectId) => {
+
+  socket.on("join-project", (projectId: string) => {
     socket.join(`project-${projectId}`);
   });
 
@@ -64,8 +79,9 @@ io.on("connection", (socket) => {
     try {
       const result = await agentOrchestrator.processRequest(data);
       socket.emit("agent-response", result);
-    } catch (error) {
-      socket.emit("agent-error", { message: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      socket.emit("agent-error", { message });
     }
   });
 
@@ -76,9 +92,11 @@ io.on("connection", (socket) => {
 
 async function startServer() {
   try {
-    await prisma.$connect();
+    await Database.connect();
     logger.info("Connected to database");
-    
+
+    agentOrchestrator = new AgentOrchestrator(io, prisma);
+
     server.listen(PORT, () => {
       logger.info(`AFRIBOLT Backend running on port ${PORT}`);
     });
@@ -87,6 +105,25 @@ async function startServer() {
     process.exit(1);
   }
 }
+
+// Graceful shutdown
+process.on("SIGTERM", async () => {
+  logger.info("SIGTERM received. Shutting down gracefully...");
+  await Database.disconnect();
+  server.close(() => {
+    logger.info("Server closed");
+    process.exit(0);
+  });
+});
+
+process.on("SIGINT", async () => {
+  logger.info("SIGINT received. Shutting down gracefully...");
+  await Database.disconnect();
+  server.close(() => {
+    logger.info("Server closed");
+    process.exit(0);
+  });
+});
 
 startServer();
 

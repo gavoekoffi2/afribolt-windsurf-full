@@ -204,9 +204,10 @@ export class EnhancedAgentOrchestrator {
             }
           } catch (error) {
             logger.error(`Failed to coordinate enhanced agent ${agentType}:`, error);
+            const errMsg = error instanceof Error ? error.message : "Unknown error";
             results[agentType] = {
               agent: agentType,
-              message: `Error: ${error.message}`,
+              message: `Error: ${errMsg}`,
               actions: [],
               nextSteps: [],
               confidence: 0,
@@ -473,8 +474,7 @@ export class EnhancedAgentOrchestrator {
             userId,
             timestamp: new Date().toISOString(),
           },
-          agentId: undefined,
-          projectId: projectId || "",
+          projectId: projectId || null,
         },
       });
     } catch (error) {
@@ -535,4 +535,15 @@ export class EnhancedAgentOrchestrator {
   }
 }
 
-export const enhancedAgentOrchestrator = new EnhancedAgentOrchestrator(null, null);
+// Lazy initialization - do not instantiate with null PrismaClient at module level
+let _enhancedOrchestrator: EnhancedAgentOrchestrator | null = null;
+
+export function getEnhancedAgentOrchestrator(io?: Server | null, prisma?: PrismaClient): EnhancedAgentOrchestrator {
+  if (!_enhancedOrchestrator) {
+    if (!prisma) {
+      throw new Error("PrismaClient required for first initialization");
+    }
+    _enhancedOrchestrator = new EnhancedAgentOrchestrator(io || null, prisma);
+  }
+  return _enhancedOrchestrator;
+}

@@ -1,5 +1,5 @@
 import "./globals.css";
-import { Inter } from "@next/font/google";
+import { Inter } from "next/font/google";
 import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -9,7 +9,11 @@ export const metadata = {
   description: "Alternative africaine premium à MGX, Cursor, Bolt, Lovable. Plateforme AI multi-agents pour le développement moderne.",
   keywords: ["AI", "multi-agents", "développement", "Afrique", "SaaS", "automation"],
   authors: [{ name: "AFRIBOLT Team" }],
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

@@ -2,12 +2,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { 
+import {
   PaperAirplaneIcon,
-  MicrophoneIcon,
   CpuChipIcon,
-  UserGroupIcon
 } from "@heroicons/react/24/outline";
+import api from "@/lib/api";
 
 interface Message {
   id: string;
@@ -64,18 +63,34 @@ export function ChatInterface() {
     setInput("");
     setIsTyping(true);
 
-    // Simuler une réponse de l'agent
-    setTimeout(() => {
+    try {
+      const response = await api.post("/api/agents/chat", {
+        agentType: selectedAgent.toLowerCase(),
+        message: input,
+        context: { projectId: "default" },
+        model: "gpt-4",
+      });
+
       const agentResponse: Message = {
         id: (Date.now() + 1).toString(),
         type: "agent",
-        content: `Je suis ${selectedAgent}. Je vais analyser votre demande et vous fournir la meilleure réponse possible.`,
+        content: response.data?.data?.response?.message || "Réponse reçue.",
         agent: selectedAgent,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, agentResponse]);
+    } catch {
+      const agentResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        type: "agent",
+        content: `Je suis ${selectedAgent}. Je suis actuellement en mode démonstration. Connectez un backend avec des clés API pour obtenir de vraies réponses IA.`,
+        agent: selectedAgent,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, agentResponse]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -172,14 +187,11 @@ export function ChatInterface() {
 
       <div className="border-t border-gray-200 p-4">
         <div className="flex items-center space-x-2">
-          <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-            <MicrophoneIcon className="h-5 w-5" />
-          </button>
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             placeholder={`Message à ${selectedAgent}...`}
             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-afribolt-500 focus:border-transparent outline-none text-sm"
           />

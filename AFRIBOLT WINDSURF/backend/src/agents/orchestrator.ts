@@ -341,9 +341,9 @@ Réponds toujours en français avec expertise collaboration.`;
   }
 
   private extractNextSteps(content: string): string[] {
-    const stepRegex = /(?:📋|next|prochain|étape):\\s*([^\\n]+)/gi;
+    const stepRegex = /(?:📋|next|prochain|étape):\s*([^\n]+)/gi;
     const matches = content.match(stepRegex);
-    return matches ? matches.map(m => m.replace(/(?:📋|next|prochain|étape):\\s*/, "").trim()) : [];
+    return matches ? matches.map(m => m.replace(/(?:📋|next|prochain|étape):\s*/, "").trim()) : [];
   }
 
   private async logAgentInteraction(
@@ -364,8 +364,7 @@ Réponds toujours en français avec expertise collaboration.`;
             userId,
             timestamp: new Date().toISOString(),
           },
-          agentId: undefined,
-          projectId: projectId || "",
+          projectId: projectId || null,
         },
       });
     } catch (error) {

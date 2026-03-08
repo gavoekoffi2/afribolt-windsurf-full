@@ -45,7 +45,7 @@ export function Header() {
                 <span className="text-white font-bold text-sm">AB</span>
               </div>
               <span className={`font-bold text-xl ${
-                scrolled ? "text-gray-900" : "text-white"
+                scrolled ? "text-gray-900" : "text-gray-900"
               }`}>
                 AFRIBOLT
               </span>
@@ -60,7 +60,7 @@ export function Header() {
                 className={`text-sm font-medium transition-colors ${
                   scrolled
                     ? "text-gray-700 hover:text-afribolt-600"
-                    : "text-white hover:text-afribolt-200"
+                    : "text-gray-700 hover:text-afribolt-600"
                 }`}
               >
                 {item.name}
@@ -83,10 +83,12 @@ export function Header() {
           <div className="lg:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle menu"
+              aria-expanded={isOpen}
               className={`p-2 rounded-md ${
                 scrolled
                   ? "text-gray-700 hover:text-afribolt-600"
-                  : "text-white hover:text-afribolt-200"
+                  : "text-gray-700 hover:text-afribolt-600"
               }`}
             >
               {isOpen ? (

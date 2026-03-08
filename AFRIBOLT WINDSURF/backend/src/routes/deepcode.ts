@@ -1,10 +1,9 @@
 import { Router } from "express";
-import { deepCodeEngine, DeepCodeAnalysis } from "../deepcode/core";
-import { deepCodePipeline, PipelineResult } from "../deepcode/pipeline";
+import { deepCodeEngine } from "../deepcode/core";
+import { deepCodePipeline } from "../deepcode/pipeline";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { validateDeepCode } from "../middleware/validation";
 import { logger } from "../utils/logger";
-import { createError } from "../middleware/errorHandler";
 
 const router = Router();
 
@@ -149,7 +148,7 @@ router.post("/docs", authenticate, validateDeepCode, async (req: AuthRequest, re
   try {
     const { code, context } = req.body;
 
-    const docs = await deepCodeEngine["generateDocumentation"](code, {
+    const docs = await deepCodePipeline.generateDocumentation(code, {
       language: context.language || "javascript",
       purpose: context.purpose || "documentation",
       audience: context.audience || "developers",

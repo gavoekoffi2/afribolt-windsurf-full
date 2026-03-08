@@ -2,15 +2,14 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { 
+import { toast } from "react-hot-toast";
+import {
   PlusIcon,
   CpuChipIcon,
   CodeBracketIcon,
   UserGroupIcon,
-  ChartBarIcon,
   ClockIcon
 } from "@heroicons/react/24/outline";
-import { Header } from "@/components/layout/Header";
 import { AgentCard } from "@/components/dashboard/AgentCard";
 import { ProjectCard } from "@/components/dashboard/ProjectCard";
 import { ChatInterface } from "@/components/dashboard/ChatInterface";
@@ -133,9 +132,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      
+    <div>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
@@ -226,7 +223,10 @@ export default function Dashboard() {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <h3 className="text-lg font-semibold text-gray-900">Tous les projets</h3>
-                      <button className="btn-primary flex items-center text-sm">
+                      <button
+                        className="btn-primary flex items-center text-sm"
+                        onClick={() => toast("Création de projet bientôt disponible")}
+                      >
                         <PlusIcon className="h-4 w-4 mr-2" />
                         Nouveau projet
                       </button>

@@ -2,16 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
-
 @layer base {
   html {
     scroll-behavior: smooth;
   }
+}
 
-  body {
-    font-family: "Inter", system-ui, sans-serif;
-  }
+.bg-grid-pattern {
+  background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 @layer components {

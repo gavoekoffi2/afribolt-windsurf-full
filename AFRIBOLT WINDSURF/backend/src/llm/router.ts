@@ -146,13 +146,18 @@ export class MultiLLMRouter {
       throw new Error("Gemini client not initialized");
     }
 
-    const geminiModel = this.gemini.getGenerativeModel({ model: "gemini-pro" });
-    
-    const lastMessage = messages[messages.length - 1];
+    const geminiModel = this.gemini.getGenerativeModel({
+      model: "gemini-pro",
+      generationConfig: {
+        temperature: options.temperature || 0.7,
+        maxOutputTokens: options.maxTokens || 2000,
+      },
+    });
+
     const prompt = messages
       .filter(m => m.role !== "assistant")
       .map(m => `${m.role}: ${m.content}`)
-      .join("\\n\\n");
+      .join("\n\n");
 
     const result = await geminiModel.generateContent(prompt);
     const response = await result.response;

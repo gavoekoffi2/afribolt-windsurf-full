@@ -36,7 +36,7 @@ Réponds toujours en français avec une approche professionnelle et inclusive.`;
     try {
       const messages: LLMMessage[] = [
         { role: "system", content: this.systemPrompt },
-        { role: "user", content: `Contexte: ${JSON.stringify(context, null, 2)}\\n\\nMessage: ${message}` }
+        { role: "user", content: `Contexte: ${JSON.stringify(context, null, 2)}\n\nMessage: ${message}` }
       ];
 
       const response = await llmRouter.generateResponse(model, messages, {
@@ -64,15 +64,15 @@ Réponds toujours en français avec une approche professionnelle et inclusive.`;
   }
 
   private extractActions(content: string): string[] {
-    const actionRegex = /(?:🎯|ACTION|Action):\\s*([^\\n]+)/gi;
+    const actionRegex = /(?:🎯|ACTION|Action):\s*([^\n]+)/gi;
     const matches = content.match(actionRegex);
-    return matches ? matches.map(m => m.replace(/(?:🎯|ACTION|Action):\\s*/, "").trim()) : [];
+    return matches ? matches.map(m => m.replace(/(?:🎯|ACTION|Action):\s*/, "").trim()) : [];
   }
 
   private extractNextSteps(content: string): string[] {
-    const stepRegex = /(?:📋|NEXT|Prochain):\\s*([^\\n]+)/gi;
+    const stepRegex = /(?:📋|NEXT|Prochain):\s*([^\n]+)/gi;
     const matches = content.match(stepRegex);
-    return matches ? matches.map(m => m.replace(/(?:📋|NEXT|Prochain):\\s*/, "").trim()) : [];
+    return matches ? matches.map(m => m.replace(/(?:📋|NEXT|Prochain):\s*/, "").trim()) : [];
   }
 
   private calculateConfidence(content: string): number {
@@ -87,7 +87,7 @@ Réponds toujours en français avec une approche professionnelle et inclusive.`;
     agents: string[],
     task: string,
     context: any = {}
-  ): Promise<{ [key: string]: AgentResponse }> {
+  ): Promise<AgentResponse> {
     const coordinationPrompt = `En tant que EMEFA, coordonne les agents suivants pour cette tâche: "${task}"
 
 Agents disponibles:

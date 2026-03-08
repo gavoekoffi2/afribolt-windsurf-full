@@ -39,6 +39,18 @@ export interface DeepCodeGeneration {
 }
 
 export class DeepCodeEngine {
+  private safeParseJSON<T>(content: string, fallback: T): T {
+    try {
+      // Try to extract JSON from markdown code blocks first
+      const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+      const jsonStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
+      return JSON.parse(jsonStr) as T;
+    } catch {
+      logger.warn("Failed to parse LLM JSON response, using fallback");
+      return fallback;
+    }
+  }
+
   private systemPrompt: string = `Tu es DeepCode, le moteur d'analyse et génération de code le plus avancé.
 
 CAPACITÉS PRINCIPALES:
@@ -109,12 +121,18 @@ Sois critique mais constructif. Identifie les vrais problèmes et propose des so
         maxTokens: 3000,
       });
 
-      // Parse JSON response
-      const analysis = JSON.parse(response.content);
-      
-      logger.info("DeepCode analysis completed", { 
+      // Parse JSON response safely
+      const analysis = this.safeParseJSON<DeepCodeAnalysis>(response.content, {
+        quality: { score: 50, issues: [], suggestions: [] },
+        security: { vulnerabilities: [], recommendations: [], score: 50 },
+        performance: { bottlenecks: [], optimizations: [], score: 50 },
+        architecture: { patterns: [], improvements: [], score: 50 },
+        overall: { score: 50, readyForProduction: false, criticalIssues: ["Unable to parse LLM response"] },
+      });
+
+      logger.info("DeepCode analysis completed", {
         overallScore: analysis.overall?.score,
-        readyForProduction: analysis.overall?.readyForProduction 
+        readyForProduction: analysis.overall?.readyForProduction
       });
 
       return analysis;
@@ -174,12 +192,19 @@ Réponds en JSON structuré avec: code, explanation, tests[], documentation, dep
         maxTokens: 4000,
       });
 
-      const generation = JSON.parse(response.content);
-      
-      logger.info("DeepCode generation completed", { 
+      const generation = this.safeParseJSON<DeepCodeGeneration>(response.content, {
+        code: "",
+        explanation: "Failed to parse generation response",
+        tests: [],
+        documentation: "",
+        dependencies: [],
+        deployment: "",
+      });
+
+      logger.info("DeepCode generation completed", {
         type: context.type,
         language: context.language,
-        codeLength: generation.code?.length 
+        codeLength: generation.code?.length
       });
 
       return generation;
@@ -236,9 +261,16 @@ Réponds en JSON structuré avec: code, explanation, tests[], documentation, dep
         maxTokens: 4000,
       });
 
-      const optimization = JSON.parse(response.content);
-      
-      logger.info("DeepCode optimization completed", { 
+      const optimization = this.safeParseJSON<DeepCodeGeneration>(response.content, {
+        code: code,
+        explanation: "Failed to parse optimization response",
+        tests: [],
+        documentation: "",
+        dependencies: [],
+        deployment: "",
+      });
+
+      logger.info("DeepCode optimization completed", {
         issuesResolved: issues.length,
         optimizationGoals: context.optimizationGoals
       });
@@ -295,12 +327,18 @@ Réponds en JSON avec: passed, score 0-100, violations[], recommendations[], nex
         maxTokens: 2000,
       });
 
-      const validation = JSON.parse(response.content);
-      
-      logger.info("DeepCode validation completed", { 
+      const validation = this.safeParseJSON(response.content, {
+        passed: false,
+        score: 0,
+        violations: ["Unable to parse validation response"],
+        recommendations: [],
+        nextSteps: ["Retry validation"],
+      });
+
+      logger.info("DeepCode validation completed", {
         passed: validation.passed,
         score: validation.score,
-        violations: validation.violations?.length 
+        violations: validation.violations?.length
       });
 
       return validation;

@@ -1,9 +1,9 @@
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
+import { Database } from "../config/database";
 
-const prisma = new PrismaClient();
+const prisma = Database.getInstance();
 const googleClient = new OAuth2Client();
 
 export class AuthService {

@@ -9,20 +9,22 @@ export const api = axios.create({
   },
 });
 
-// Add auth token to requests
+// Add auth token to requests (SSR-safe)
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("afribolt_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("afribolt_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 });
 
-// Handle auth errors
+// Handle auth errors (SSR-safe)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (typeof window !== "undefined" && error.response?.status === 401) {
       localStorage.removeItem("afribolt_token");
       window.location.href = "/auth/login";
     }

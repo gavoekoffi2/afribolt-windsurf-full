@@ -1,10 +1,11 @@
 /** @type {import("next").NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
+  output: "standalone",
   images: {
-    domains: ["localhost", "afribolt.com"],
+    remotePatterns: [
+      { protocol: "https", hostname: "afribolt.com" },
+      { protocol: "http", hostname: "localhost" },
+    ],
   },
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",

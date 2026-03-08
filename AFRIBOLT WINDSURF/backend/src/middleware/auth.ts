@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import { Database } from "../config/database";
 import { createError } from "./errorHandler";
 
-const prisma = new PrismaClient();
+const prisma = Database.getInstance();
 
 export interface AuthRequest extends Request {
   user?: {
@@ -20,12 +20,17 @@ export const authenticate = async (
 ) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
-    
+
     if (!token) {
       throw createError("Access token required", 401);
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw createError("Server configuration error", 500);
+    }
+
+    const decoded = jwt.verify(token, jwtSecret) as { id: string; email: string };
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
       select: { id: true, email: true, name: true }
@@ -40,6 +45,8 @@ export const authenticate = async (
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
       next(createError("Invalid token", 401));
+    } else if (error instanceof jwt.TokenExpiredError) {
+      next(createError("Token expired", 401));
     } else {
       next(error);
     }
@@ -53,16 +60,21 @@ export const optionalAuth = async (
 ) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
-    
+
     if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret) {
+        return next();
+      }
+
+      const decoded = jwt.verify(token, jwtSecret) as { id: string; email: string };
       const user = await prisma.user.findUnique({
         where: { id: decoded.id },
         select: { id: true, email: true, name: true }
       });
       req.user = user || undefined;
     }
-    
+
     next();
   } catch (error) {
     next();

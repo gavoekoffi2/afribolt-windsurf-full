@@ -1,4 +1,5 @@
 import { deepCodeEngine, DeepCodeAnalysis, DeepCodeGeneration } from "./core";
+import { llmRouter, LLMMessage } from "../llm/router";
 import { logger } from "../utils/logger";
 
 export interface PipelineConfig {
@@ -293,17 +294,30 @@ La documentation doit être:
 
 Réponds en JSON structuré.`;
 
-      const messages = [
+      const messages: LLMMessage[] = [
         { role: "system", content: "Tu es un expert en documentation technique." },
         { role: "user", content: docPrompt }
       ];
 
-      const response = await deepCodeEngine["generateResponse"]("gpt-4", messages, {
+      const response = await llmRouter.generateResponse("gpt-4", messages, {
         temperature: 0.3,
         maxTokens: 3000,
       });
 
-      const docs = JSON.parse(response.content);
+      let docs;
+      try {
+        const jsonMatch = response.content.match(/```(?:json)?\s*([\s\S]*?)```/);
+        const jsonStr = jsonMatch ? jsonMatch[1].trim() : response.content.trim();
+        docs = JSON.parse(jsonStr);
+      } catch {
+        docs = {
+          apiDocs: response.content,
+          userGuide: "",
+          developerGuide: "",
+          examples: [],
+          troubleshooting: [],
+        };
+      }
       
       logger.info("Documentation generated successfully", {
         audience: context.audience,

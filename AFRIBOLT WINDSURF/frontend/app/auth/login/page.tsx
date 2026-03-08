@@ -24,11 +24,15 @@ export default function LoginPage() {
     try {
       const response = await api.post("/api/auth/login", formData);
       
-      localStorage.setItem("afribolt_token", response.data.data.token);
+      const token = response.data?.data?.token || response.data?.token;
+      if (token) {
+        localStorage.setItem("afribolt_token", token);
+      }
       toast.success("Connexion réussie!");
       router.push("/dashboard");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Erreur de connexion");
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { error?: { message?: string }; message?: string } } };
+      toast.error(axiosError.response?.data?.error?.message || axiosError.response?.data?.message || "Erreur de connexion");
     } finally {
       setIsLoading(false);
     }
@@ -129,12 +133,9 @@ export default function LoginPage() {
           </div>
 
           <div className="text-center">
-            <Link
-              href="/auth/forgot-password"
-              className="text-sm text-afribolt-600 hover:text-afribolt-500"
-            >
+            <span className="text-sm text-gray-500 cursor-not-allowed" title="Bientôt disponible">
               Mot de passe oublié?
-            </Link>
+            </span>
           </div>
         </motion.form>
       </motion.div>

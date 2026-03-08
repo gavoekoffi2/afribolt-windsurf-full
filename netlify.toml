@@ -1,3 +1,9 @@
 [build]
-  command = "unzip -o \"AFRIBOLT WINDSURF-20260115T093212Z-3-001.zip\" && cd \"AFRIBOLT WINDSURF/frontend\" && npm install && npm run build"
+  command = "cd \"AFRIBOLT WINDSURF/frontend\" && npm install && npm run build"
   publish = "AFRIBOLT WINDSURF/frontend/.next"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

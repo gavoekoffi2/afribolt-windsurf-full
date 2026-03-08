@@ -4,22 +4,29 @@ services:
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_DB: afribolt
-      POSTGRES_USER: afribolt
-      POSTGRES_PASSWORD: afribolt123
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${POSTGRES_DB:-afribolt}
+      POSTGRES_USER: ${POSTGRES_USER:-afribolt}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - afribolt-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-afribolt}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    command: redis-server --requirepass ${REDIS_PASSWORD:-changeme}
     networks:
       - afribolt-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
@@ -27,17 +34,20 @@ services:
       dockerfile: Dockerfile
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://afribolt:afribolt123@postgres:5432/afribolt
-      REDIS_URL: redis://redis:6379
-      JWT_SECRET: your-production-jwt-secret
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-      GOOGLE_AI_API_KEY: ${GOOGLE_AI_API_KEY}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-afribolt}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-afribolt}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      GOOGLE_AI_API_KEY: ${GOOGLE_AI_API_KEY:-}
     ports:
       - "3001:3001"
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - afribolt-network
     volumes:
@@ -48,7 +58,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
     ports:
       - "3000:3000"
     depends_on:
