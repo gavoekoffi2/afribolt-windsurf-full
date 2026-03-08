@@ -499,8 +499,8 @@ export class EnhancedAgentOrchestrator {
             userId,
             timestamp: new Date().toISOString(),
           },
-          agentId: undefined,
-          projectId: "",
+          agentId: null,
+          projectId: null,
         },
       });
     } catch (error) {

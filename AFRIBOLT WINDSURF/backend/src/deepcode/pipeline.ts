@@ -179,7 +179,8 @@ export class DeepCodePipeline {
         });
       } catch (error) {
         logger.error(`Optimization iteration ${iteration} failed:`, error);
-        warnings.push(`Optimization iteration ${iteration} failed: ${error}`);
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        warnings.push(`Optimization iteration ${iteration} failed: ${errorMsg}`);
         break;
       }
     }

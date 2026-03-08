@@ -93,7 +93,7 @@ export class MultiLLMRouter {
     });
 
     return {
-      content: completion.choices[0].message.content || "",
+      content: completion.choices?.[0]?.message?.content || "",
       model,
       usage: {
         promptTokens: completion.usage?.prompt_tokens,
@@ -127,7 +127,7 @@ export class MultiLLMRouter {
     });
 
     return {
-      content: response.content[0].type === "text" ? response.content[0].text : "",
+      content: response.content?.[0]?.type === "text" ? (response.content[0] as { type: "text"; text: string }).text : "",
       model,
       usage: {
         promptTokens: response.usage.input_tokens,

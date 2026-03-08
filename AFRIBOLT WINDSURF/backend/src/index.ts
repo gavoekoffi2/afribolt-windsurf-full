@@ -77,6 +77,10 @@ io.on("connection", (socket) => {
 
   socket.on("agent-request", async (data) => {
     try {
+      if (!agentOrchestrator) {
+        socket.emit("agent-error", { message: "System not ready" });
+        return;
+      }
       const result = await agentOrchestrator.processRequest(data);
       socket.emit("agent-response", result);
     } catch (error: unknown) {
