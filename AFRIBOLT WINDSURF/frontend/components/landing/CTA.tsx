@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ArrowRightIcon, RocketLaunchIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 export function CTA() {
   return (
@@ -29,19 +30,19 @@ export function CTA() {
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a
+            <Link
               href="/auth/register"
               className="bg-white text-afribolt-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors duration-200 flex items-center group shadow-xl"
             >
               Commencer gratuitement
               <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a
+            </Link>
+            <Link
               href="/dashboard"
               className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-afribolt-600 transition-all duration-200"
             >
               Voir le dashboard
-            </a>
+            </Link>
           </div>
 
           <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">

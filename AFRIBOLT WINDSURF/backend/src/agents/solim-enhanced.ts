@@ -2,6 +2,7 @@ import { llmRouter, LLMMessage } from "../llm/router";
 import { deepCodePipeline, PipelineResult } from "../deepcode/pipeline";
 import { deepCodeEngine, DeepCodeAnalysis } from "../deepcode/core";
 import { logger } from "../utils/logger";
+import { safeParseJSON } from "../utils/safeParseJSON";
 
 export interface SolimDesignSolution {
   wireframes: Array<{
@@ -179,7 +180,7 @@ Réponds en JSON structuré avec: wireframes, uiComponents, designSystem, userEx
         maxTokens: 4000,
       });
 
-      const designSolution = JSON.parse(response.content);
+      const designSolution = safeParseJSON(response.content, {} as any);
 
       // Générer le code design complet
       const designCode = this.generateDesignCode(designSolution);
@@ -286,7 +287,7 @@ Réponds en JSON structuré.`;
         maxTokens: 3500,
       });
 
-      const optimization = JSON.parse(response.content);
+      const optimization = safeParseJSON(response.content, {} as any);
 
       // Valider le design optimisé
       const optimizedAnalysis = await deepCodeEngine.analyzeCode(optimization.optimizedDesign, {
@@ -373,7 +374,7 @@ Réponds en JSON structuré avec: wireframes, userFlow, designSpecifications`;
         maxTokens: 4000,
       });
 
-      const wireframes = JSON.parse(response.content);
+      const wireframes = safeParseJSON(response.content, {} as any);
 
       // Valider les wireframes avec DeepCode
       const wireframeCode = this.generateWireframeCode(wireframes);
@@ -464,7 +465,7 @@ Réponds en JSON structuré.`;
         maxTokens: 3500,
       });
 
-      const accessibility = JSON.parse(response.content);
+      const accessibility = safeParseJSON(response.content, {} as any);
 
       // Valider le design accessible
       const compliantAnalysis = await deepCodeEngine.analyzeCode(accessibility.compliantDesign, {

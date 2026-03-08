@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { CheckIcon, StarIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 const plans = [
   {
@@ -138,15 +139,16 @@ export function Pricing() {
               </ul>
 
               <div className="mt-8">
-                <button
-                  className={`w-full rounded-lg px-4 py-3 text-center font-medium transition-colors ${
+                <Link
+                  href="/auth/register"
+                  className={`block w-full rounded-lg px-4 py-3 text-center font-medium transition-colors ${
                     plan.featured
                       ? "bg-white text-afribolt-600 hover:bg-gray-100"
                       : "btn-primary"
                   }`}
                 >
                   {plan.name === "Starter" ? "Commencer gratuit" : "S'abonner"}
-                </button>
+                </Link>
               </div>
             </motion.div>
           ))}

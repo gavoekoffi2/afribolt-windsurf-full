@@ -2,6 +2,7 @@ import { llmRouter, LLMMessage } from "../llm/router";
 import { deepCodePipeline, PipelineResult } from "../deepcode/pipeline";
 import { deepCodeEngine, DeepCodeAnalysis } from "../deepcode/core";
 import { logger } from "../utils/logger";
+import { safeParseJSON } from "../utils/safeParseJSON";
 
 export interface KwamiDocumentationSolution {
   technicalDocs: Array<{
@@ -187,7 +188,7 @@ Réponds en JSON structuré avec: technicalDocs, userGuides, apiDocs, codeExampl
         maxTokens: 4000,
       });
 
-      const documentationSolution = JSON.parse(response.content);
+      const documentationSolution = safeParseJSON(response.content, {} as any);
 
       // Valider la documentation avec DeepCode
       const documentationCode = this.generateDocumentationCode(documentationSolution);
@@ -301,7 +302,7 @@ Réponds en JSON structuré.`;
         maxTokens: 3500,
       });
 
-      const apiReference = JSON.parse(response.content);
+      const apiReference = safeParseJSON(response.content, {} as any);
 
       // Valider la référence API
       const referenceCode = this.generateAPIReferenceCode(apiReference);
@@ -396,7 +397,7 @@ Réponds en JSON structuré avec: userGuides, tutorials, faq`;
         maxTokens: 4000,
       });
 
-      const userGuides = JSON.parse(response.content);
+      const userGuides = safeParseJSON(response.content, {} as any);
 
       // Valider les guides utilisateurs
       const guidesCode = this.generateUserGuidesCode(userGuides);
@@ -489,7 +490,7 @@ Réponds en JSON structuré.`;
         maxTokens: 3500,
       });
 
-      const optimization = JSON.parse(response.content);
+      const optimization = safeParseJSON(response.content, {} as any);
 
       // Valider la documentation optimisée
       const optimizedAnalysis = await deepCodeEngine.analyzeCode(optimization.optimizedDocs, {

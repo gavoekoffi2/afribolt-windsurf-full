@@ -2,6 +2,7 @@ import { llmRouter, LLMMessage } from "../llm/router";
 import { deepCodePipeline, PipelineResult } from "../deepcode/pipeline";
 import { deepCodeEngine, DeepCodeAnalysis } from "../deepcode/core";
 import { logger } from "../utils/logger";
+import { safeParseJSON } from "../utils/safeParseJSON";
 
 export interface DedeBackendSolution {
   api: {
@@ -178,7 +179,7 @@ Réponds en JSON structuré avec: api, database, infrastructure, deepCodeValidat
         maxTokens: 4000,
       });
 
-      const backendSolution = JSON.parse(response.content);
+      const backendSolution = safeParseJSON(response.content, {} as any);
 
       // Générer le code backend complet
       const backendCode = this.generateBackendCode(backendSolution, context);
@@ -275,7 +276,7 @@ Réponds en JSON structuré.`;
         maxTokens: 3500,
       });
 
-      const optimization = JSON.parse(response.content);
+      const optimization = safeParseJSON(response.content, {} as any);
 
       // Valider le code optimisé
       const optimizedAnalysis = await deepCodeEngine.analyzeCode(optimization.optimizedCode, {
@@ -361,7 +362,7 @@ Réponds en JSON structuré.`;
         maxTokens: 3500,
       });
 
-      const security = JSON.parse(response.content);
+      const security = safeParseJSON(response.content, {} as any);
 
       // Valider le code sécurisé
       const securedAnalysis = await deepCodeEngine.analyzeCode(security.securedCode, {
@@ -441,7 +442,7 @@ Réponds en JSON structuré avec: schema, migrations, indexes, optimizations`;
         maxTokens: 3000,
       });
 
-      const schema = JSON.parse(response.content);
+      const schema = safeParseJSON(response.content, {} as any);
 
       // Valider le schéma avec DeepCode
       const schemaCode = this.generateSchemaCode(schema, context.databaseType);

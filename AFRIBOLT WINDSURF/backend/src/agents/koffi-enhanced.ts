@@ -2,6 +2,7 @@ import { llmRouter, LLMMessage } from "../llm/router";
 import { deepCodePipeline, PipelineResult } from "../deepcode/pipeline";
 import { deepCodeEngine, DeepCodeAnalysis } from "../deepcode/core";
 import { logger } from "../utils/logger";
+import { safeParseJSON } from "../utils/safeParseJSON";
 
 export interface KoffiArchitecturePlan {
   systemDesign: string;
@@ -166,7 +167,7 @@ Réponds en JSON structuré avec: systemDesign, technologyStack, architecture, d
         maxTokens: 3500,
       });
 
-      const architecturePlan = JSON.parse(response.content);
+      const architecturePlan = safeParseJSON(response.content, {} as any);
 
       // Valider l'architecture avec DeepCode
       const architectureCode = this.generateArchitectureCode(architecturePlan);
@@ -255,7 +256,7 @@ Réponds en JSON structuré.`;
         maxTokens: 3000,
       });
 
-      const optimization = JSON.parse(response.content);
+      const optimization = safeParseJSON(response.content, {} as any);
 
       // Valider l'architecture optimisée avec DeepCode
       const optimizedAnalysis = await deepCodeEngine.analyzeCode(optimization.optimizedArchitecture, {
@@ -340,7 +341,7 @@ Réponds en JSON avec: score, recommendations[], alternatives{frontend:[], backe
         maxTokens: 2000,
       });
 
-      const validation = JSON.parse(response.content);
+      const validation = safeParseJSON(response.content, {} as any);
 
       logger.info("KOFFI validated technology stack", {
         stackSize: Object.keys(stack).length,

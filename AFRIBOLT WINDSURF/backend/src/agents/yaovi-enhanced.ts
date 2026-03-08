@@ -2,6 +2,7 @@ import { llmRouter, LLMMessage } from "../llm/router";
 import { deepCodePipeline, PipelineResult } from "../deepcode/pipeline";
 import { deepCodeEngine, DeepCodeAnalysis } from "../deepcode/core";
 import { logger } from "../utils/logger";
+import { safeParseJSON } from "../utils/safeParseJSON";
 
 export interface YaoviCollaborationSolution {
   collaborationPlan: {
@@ -182,7 +183,7 @@ Réponds en JSON structuré avec: collaborationPlan, conflictResolution, codeRev
         maxTokens: 4000,
       });
 
-      const collaborationSolution = JSON.parse(response.content);
+      const collaborationSolution = safeParseJSON(response.content, {} as any);
 
       // Valider la solution avec DeepCode
       const collaborationCode = this.generateCollaborationCode(collaborationSolution);
@@ -277,7 +278,7 @@ Réponds en JSON structuré avec: resolutions, prevention, workflow`;
         maxTokens: 3500,
       });
 
-      const conflictResolution = JSON.parse(response.content);
+      const conflictResolution = safeParseJSON(response.content, {} as any);
 
       // Valider les résolutions avec DeepCode
       const resolutionCode = this.generateResolutionCode(conflictResolution);
@@ -371,7 +372,7 @@ Réponds en JSON structuré.`;
         maxTokens: 3500,
       });
 
-      const optimization = JSON.parse(response.content);
+      const optimization = safeParseJSON(response.content, {} as any);
 
       // Valider le workflow optimisé
       const optimizedAnalysis = await deepCodeEngine.analyzeCode(optimization.optimizedWorkflow, {
@@ -460,7 +461,7 @@ Réponds en JSON structuré avec: reviewProcess, qualityGates, metrics, integrat
         maxTokens: 3500,
       });
 
-      const codeReview = JSON.parse(response.content);
+      const codeReview = safeParseJSON(response.content, {} as any);
 
       // Valider le processus avec DeepCode
       const reviewCode = this.generateReviewCode(codeReview);

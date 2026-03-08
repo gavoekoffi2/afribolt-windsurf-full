@@ -1,9 +1,16 @@
 [build]
-  command = "cd \"AFRIBOLT WINDSURF/frontend\" && npm install && npm run build"
-  publish = "AFRIBOLT WINDSURF/frontend/.next"
+  base = "AFRIBOLT WINDSURF/frontend"
+  command = "npm install && npm run build"
+  publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+[[redirects]]
+  from = "/api/*"
+  to = "${NEXT_PUBLIC_API_URL}/api/:splat"
+  status = 200
+  force = true

@@ -2,12 +2,13 @@
 
 import { motion } from "framer-motion";
 import { ArrowRightIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-afribolt-50 via-white to-primary-50">
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      
+
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 pb-16 sm:pt-24 sm:pb-20">
         <div className="text-center">
           <motion.div
@@ -17,7 +18,7 @@ export function Hero() {
             className="inline-flex items-center rounded-full bg-afribolt-100 px-4 py-2 text-sm font-medium text-afribolt-800 mb-6"
           >
             <SparklesIcon className="h-4 w-4 mr-2" />
-            Nouvelle revolution AI africaine
+            Nouvelle révolution IA africaine
           </motion.div>
 
           <motion.h1
@@ -26,8 +27,8 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl lg:text-7xl"
           >
-            <span className="block">Lavenir du</span>
-            <span className="block text-gradient">developpement AI</span>
+            <span className="block">L&apos;avenir du</span>
+            <span className="block text-gradient">développement IA</span>
             <span className="block text-2xl sm:text-3xl lg:text-4xl mt-2 text-gray-600">
               est africain
             </span>
@@ -39,8 +40,8 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600 sm:text-xl"
           >
-            AFRIBOLT est la plateforme AI multi-agents qui revolutionne le developpement logiciel. 
-            7 agents specialises collaboratifs pour creer, deployer et scaler vos projets.
+            AFRIBOLT est la plateforme IA multi-agents qui révolutionne le développement logiciel.
+            7 agents spécialisés collaboratifs pour créer, déployer et scaler vos projets.
           </motion.p>
 
           <motion.div
@@ -49,18 +50,18 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <a
+            <Link
               href="/auth/register"
               className="btn-primary text-lg px-8 py-4 flex items-center group"
             >
               Commencer gratuitement
               <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </a>
+            </Link>
             <a
               href="#features"
               className="btn-secondary text-lg px-8 py-4"
             >
-              Decouvrir plus
+              Découvrir plus
             </a>
           </motion.div>
 
@@ -72,15 +73,15 @@ export function Hero() {
           >
             <div className="text-center">
               <div className="text-3xl font-bold text-afribolt-600">7</div>
-              <div className="text-sm text-gray-600 mt-1">Agents IA specialises</div>
+              <div className="text-sm text-gray-600 mt-1">Agents IA spécialisés</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-afribolt-600">∞</div>
-              <div className="text-sm text-gray-600 mt-1">Projets illimites</div>
+              <div className="text-sm text-gray-600 mt-1">Projets illimités</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-afribolt-600">24/7</div>
-              <div className="text-sm text-gray-600 mt-1">Disponibilite</div>
+              <div className="text-sm text-gray-600 mt-1">Disponibilité</div>
             </div>
           </motion.div>
         </div>

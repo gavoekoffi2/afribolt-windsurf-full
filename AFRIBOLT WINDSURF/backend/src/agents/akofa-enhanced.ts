@@ -2,6 +2,7 @@ import { llmRouter, LLMMessage } from "../llm/router";
 import { deepCodePipeline, PipelineResult } from "../deepcode/pipeline";
 import { deepCodeEngine, DeepCodeAnalysis } from "../deepcode/core";
 import { logger } from "../utils/logger";
+import { safeParseJSON } from "../utils/safeParseJSON";
 
 export interface AkofaFrontendSolution {
   components: Array<{
@@ -180,7 +181,7 @@ Réponds en JSON structuré avec: components, pages, styling, performance, deepC
         maxTokens: 4000,
       });
 
-      const frontendSolution = JSON.parse(response.content);
+      const frontendSolution = safeParseJSON(response.content, {} as any);
 
       // Générer le code frontend complet
       const frontendCode = this.generateFrontendCode(frontendSolution, context);
@@ -278,7 +279,7 @@ Réponds en JSON structuré.`;
         maxTokens: 3500,
       });
 
-      const optimization = JSON.parse(response.content);
+      const optimization = safeParseJSON(response.content, {} as any);
 
       // Valider le code optimisé
       const optimizedAnalysis = await deepCodeEngine.analyzeCode(optimization.optimizedCode, {
@@ -368,7 +369,7 @@ Réponds en JSON structuré.`;
         maxTokens: 3500,
       });
 
-      const accessibility = JSON.parse(response.content);
+      const accessibility = safeParseJSON(response.content, {} as any);
 
       // Valider le code accessible
       const enhancedAnalysis = await deepCodeEngine.analyzeCode(accessibility.enhancedCode, {
@@ -454,7 +455,7 @@ Réponds en JSON structuré avec: designTokens, components, theme, documentation
         maxTokens: 3500,
       });
 
-      const designSystem = JSON.parse(response.content);
+      const designSystem = safeParseJSON(response.content, {} as any);
 
       // Valider le design system avec DeepCode
       const designSystemCode = this.generateDesignSystemCode(designSystem);
