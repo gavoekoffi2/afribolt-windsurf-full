@@ -45,15 +45,28 @@ export const validateAgentRequest = (req: Request, res: Response, next: NextFunc
 };
 
 export const validateDeepCode = (req: Request, res: Response, next: NextFunction) => {
+  const contextSchema = Joi.object({
+    language: Joi.string().valid("javascript", "typescript", "python", "java", "go", "rust", "csharp", "php", "ruby").required(),
+    framework: Joi.string().optional(),
+    purpose: Joi.string().optional(),
+    type: Joi.string().optional(),
+    audience: Joi.string().optional(),
+    environment: Joi.string().valid("development", "staging", "production").optional(),
+    optimizationGoals: Joi.array().items(Joi.string()).optional(),
+    standards: Joi.array().items(Joi.string()).optional(),
+  }).required();
+
   const schema = Joi.object({
-    code: Joi.string().min(1).max(100000).required(),
-    context: Joi.object({
-      language: Joi.string().valid("javascript", "typescript", "python", "java", "go", "rust", "csharp", "php", "ruby").required(),
-      framework: Joi.string().optional(),
-      purpose: Joi.string().optional(),
-      environment: Joi.string().valid("development", "staging", "production").optional(),
-    }).required(),
-  });
+    code: Joi.string().min(1).max(100000).optional(),
+    description: Joi.string().min(1).max(10000).optional(),
+    context: contextSchema,
+    issues: Joi.array().items(Joi.string()).optional(),
+    files: Joi.array().items(Joi.object({
+      name: Joi.string().required(),
+      code: Joi.string().required(),
+      context: Joi.object().optional(),
+    })).optional(),
+  }).or("code", "description", "files");
 
   const { error } = schema.validate(req.body);
   if (error) {

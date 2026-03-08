@@ -39,6 +39,8 @@ model Project {
   sessions   Session[]
   histories  History[]
 
+  @@index([userId])
+  @@index([status])
   @@map("projects")
 }
 
@@ -57,6 +59,8 @@ model Agent {
 
   histories History[]
 
+  @@index([projectId])
+  @@index([type])
   @@map("agents")
 }
 
@@ -72,6 +76,8 @@ model AgentConfig {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([agentType])
   @@map("agent_configs")
 }
 
@@ -88,6 +94,8 @@ model Session {
   projectId String
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([projectId])
   @@map("sessions")
 }
 
@@ -103,5 +111,9 @@ model History {
   projectId String?
   project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
+  @@index([agentId])
+  @@index([projectId])
+  @@index([type])
+  @@index([createdAt])
   @@map("histories")
 }

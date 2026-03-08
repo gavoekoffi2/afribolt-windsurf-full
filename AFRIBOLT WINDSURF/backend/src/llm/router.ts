@@ -43,6 +43,13 @@ export class MultiLLMRouter {
     if (process.env.GOOGLE_AI_API_KEY) {
       this.gemini = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
     }
+
+    const available = this.getAvailableModels();
+    if (available.length === 0) {
+      logger.warn("No LLM providers configured. Set OPENAI_API_KEY, ANTHROPIC_API_KEY, or GOOGLE_AI_API_KEY.");
+    } else {
+      logger.info(`LLM providers ready: ${available.join(", ")}`);
+    }
   }
 
   async generateResponse(

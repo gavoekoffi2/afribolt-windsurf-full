@@ -16,6 +16,7 @@ import { rateLimiter } from "./middleware/rateLimiter";
 import { logger } from "./utils/logger";
 import { AgentOrchestrator } from "./agents/orchestrator";
 import { Database } from "./config/database";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ for (const envVar of requiredEnvVars) {
 }
 
 const app = express();
+app.set("trust proxy", 1);
 const server = createServer(app);
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
@@ -68,8 +70,23 @@ app.use(errorHandler);
 
 let agentOrchestrator: AgentOrchestrator;
 
+// Socket.io authentication middleware
+io.use((socket, next) => {
+  const token = socket.handshake.auth?.token || socket.handshake.headers?.authorization?.replace("Bearer ", "");
+  if (!token) {
+    return next(new Error("Authentication required"));
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string; email: string };
+    (socket as any).userId = decoded.id;
+    next();
+  } catch {
+    next(new Error("Invalid token"));
+  }
+});
+
 io.on("connection", (socket) => {
-  logger.info(`Client connected: ${socket.id}`);
+  logger.info(`Client connected: ${socket.id} (user: ${(socket as any).userId})`);
 
   socket.on("join-project", (projectId: string) => {
     socket.join(`project-${projectId}`);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
 import {
@@ -13,122 +13,80 @@ import {
 import { AgentCard } from "@/components/dashboard/AgentCard";
 import { ProjectCard } from "@/components/dashboard/ProjectCard";
 import { ChatInterface } from "@/components/dashboard/ChatInterface";
+import api from "@/lib/api";
+
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  status: "active" | "planning" | "completed";
+  updatedAt: string;
+  agents: { name: string; type: string; status: string }[];
+  _count?: { sessions: number; histories: number };
+}
+
+const DEMO_AGENTS = [
+  { name: "EMEFA", role: "Team Lead AI", status: "active" as const, lastMessage: "Coordination du projet terminée", color: "agent-emefa" },
+  { name: "KOFFI", role: "Architecte & Stratégie", status: "idle" as const, lastMessage: "Architecture validée", color: "agent-koffi" },
+  { name: "DÉDÉ", role: "Backend & Infrastructure", status: "active" as const, lastMessage: "API en développement", color: "agent-dede" },
+  { name: "SOLIM", role: "UX / UI Designer", status: "idle" as const, lastMessage: "Wireframes prêts", color: "agent-solim" },
+  { name: "AKOFA", role: "Frontend Builder", status: "active" as const, lastMessage: "Components React créés", color: "agent-akofa" },
+  { name: "KWAMI", role: "Documentation & Knowledge", status: "idle" as const, lastMessage: "Documentation mise à jour", color: "agent-kwami" },
+  { name: "YAOVI", role: "Dev Collaboration", status: "active" as const, lastMessage: "Bug résolu", color: "agent-yaovi" },
+];
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedProject, setSelectedProject] = useState(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newProjectName, setNewProjectName] = useState("");
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await api.get("/api/projects");
+      setProjects(response.data?.data?.projects || []);
+    } catch {
+      // API unavailable - use empty state
+      setProjects([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createProject = async () => {
+    if (!newProjectName.trim()) return;
+    try {
+      await api.post("/api/projects", { name: newProjectName.trim() });
+      toast.success("Projet créé avec succès!");
+      setNewProjectName("");
+      setIsCreating(false);
+      fetchProjects();
+    } catch {
+      toast.error("Erreur lors de la création du projet");
+    }
+  };
+
+  const displayProjects = projects.map((p) => ({
+    id: p.id,
+    name: p.name,
+    description: p.description || "Aucune description",
+    status: p.status as "active" | "planning" | "completed",
+    lastActivity: new Date(p.updatedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
+    agents: p.agents?.map((a) => a.name) || [],
+    progress: p.status === "completed" ? 100 : p.status === "active" ? 50 : 10,
+  }));
 
   const stats = [
-    {
-      name: "Projets actifs",
-      value: "12",
-      change: "+2",
-      changeType: "increase",
-      icon: CodeBracketIcon
-    },
-    {
-      name: "Agents utilisés",
-      value: "7",
-      change: "0",
-      changeType: "neutral",
-      icon: CpuChipIcon
-    },
-    {
-      name: "Messages IA",
-      value: "1,234",
-      change: "+156",
-      changeType: "increase",
-      icon: UserGroupIcon
-    },
-    {
-      name: "Temps économisé",
-      value: "48h",
-      change: "+12h",
-      changeType: "increase",
-      icon: ClockIcon
-    }
-  ];
-
-  const recentProjects = [
-    {
-      id: "1",
-      name: "E-commerce Platform",
-      description: "Plateforme de vente en ligne moderne",
-      status: "active",
-      lastActivity: "Il y a 2 heures",
-      agents: ["EMEFA", "KOFFI", "DÉDÉ"],
-      progress: 75
-    },
-    {
-      id: "2", 
-      name: "Mobile Banking App",
-      description: "Application bancaire mobile sécurisée",
-      status: "active",
-      lastActivity: "Il y a 5 heures",
-      agents: ["SOLIM", "AKOFA", "YAOVI"],
-      progress: 60
-    },
-    {
-      id: "3",
-      name: "AI Analytics Dashboard",
-      description: "Dashboard d'analyse avec IA intégrée",
-      status: "planning",
-      lastActivity: "Hier",
-      agents: ["KWAMI"],
-      progress: 25
-    }
-  ];
-
-  const agents = [
-    {
-      name: "EMEFA",
-      role: "Team Lead AI",
-      status: "active",
-      lastMessage: "Coordination du projet terminée",
-      color: "agent-emefa"
-    },
-    {
-      name: "KOFFI",
-      role: "Architecte & Stratégie",
-      status: "idle",
-      lastMessage: "Architecture validée",
-      color: "agent-koffi"
-    },
-    {
-      name: "DÉDÉ",
-      role: "Backend & Infrastructure",
-      status: "active",
-      lastMessage: "API en développement",
-      color: "agent-dede"
-    },
-    {
-      name: "SOLIM",
-      role: "UX / UI Designer",
-      status: "idle",
-      lastMessage: "Wireframes prêts",
-      color: "agent-solim"
-    },
-    {
-      name: "AKOFA",
-      role: "Frontend Builder",
-      status: "active",
-      lastMessage: "Components React créés",
-      color: "agent-akofa"
-    },
-    {
-      name: "KWAMI",
-      role: "Documentation & Knowledge",
-      status: "idle",
-      lastMessage: "Documentation mise à jour",
-      color: "agent-kwami"
-    },
-    {
-      name: "YAOVI",
-      role: "Dev Collaboration",
-      status: "active",
-      lastMessage: "Bug résolu",
-      color: "agent-yaovi"
-    }
+    { name: "Projets actifs", value: String(projects.filter(p => p.status === "active").length), icon: CodeBracketIcon },
+    { name: "Agents disponibles", value: "7", icon: CpuChipIcon },
+    { name: "Sessions", value: String(projects.reduce((sum, p) => sum + (p._count?.sessions || 0), 0)), icon: UserGroupIcon },
+    { name: "Historiques", value: String(projects.reduce((sum, p) => sum + (p._count?.histories || 0), 0)), icon: ClockIcon },
   ];
 
   return (
@@ -151,16 +109,9 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-                  <p className="text-2xl font-semibold text-gray-900 mt-1">{stat.value}</p>
-                  <div className="flex items-center mt-2">
-                    <span className={`text-sm font-medium ${
-                      stat.changeType === "increase" ? "text-green-600" : 
-                      stat.changeType === "decrease" ? "text-red-600" : "text-gray-500"
-                    }`}>
-                      {stat.change}
-                    </span>
-                    <span className="text-sm text-gray-500 ml-1">vs mois dernier</span>
-                  </div>
+                  <p className="text-2xl font-semibold text-gray-900 mt-1">
+                    {isLoading ? "..." : stat.value}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
                   <stat.icon className="h-6 w-6 text-gray-600" />
@@ -185,7 +136,7 @@ export default function Dashboard() {
                           : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                       }`}
                     >
-                      {tab === "overview" ? "Vue d'ensemble" : 
+                      {tab === "overview" ? "Vue d'ensemble" :
                        tab === "projects" ? "Projets" : "Agents"}
                     </button>
                   ))}
@@ -197,21 +148,38 @@ export default function Dashboard() {
                   <div className="space-y-6">
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Projets récents</h3>
-                      <div className="space-y-4">
-                        {recentProjects.slice(0, 3).map((project) => (
-                          <ProjectCard
-                            key={project.id}
-                            project={project}
-                            onSelect={() => setSelectedProject(project)}
-                          />
-                        ))}
-                      </div>
+                      {isLoading ? (
+                        <div className="flex justify-center py-8">
+                          <div className="w-6 h-6 border-2 border-afribolt-600 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      ) : displayProjects.length > 0 ? (
+                        <div className="space-y-4">
+                          {displayProjects.slice(0, 3).map((project) => (
+                            <ProjectCard
+                              key={project.id}
+                              project={project}
+                              onSelect={() => setSelectedProject(project as any)}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 text-gray-500">
+                          <CodeBracketIcon className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                          <p>Aucun projet pour le moment.</p>
+                          <button
+                            onClick={() => { setActiveTab("projects"); setIsCreating(true); }}
+                            className="btn-primary mt-4 text-sm"
+                          >
+                            Créer votre premier projet
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Agents actifs</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Agents disponibles</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {agents.filter(a => a.status === "active").map((agent) => (
+                        {DEMO_AGENTS.filter(a => a.status === "active").map((agent) => (
                           <AgentCard key={agent.name} agent={agent} />
                         ))}
                       </div>
@@ -225,21 +193,59 @@ export default function Dashboard() {
                       <h3 className="text-lg font-semibold text-gray-900">Tous les projets</h3>
                       <button
                         className="btn-primary flex items-center text-sm"
-                        onClick={() => toast("Création de projet bientôt disponible")}
+                        onClick={() => setIsCreating(true)}
                       >
                         <PlusIcon className="h-4 w-4 mr-2" />
                         Nouveau projet
                       </button>
                     </div>
-                    <div className="space-y-4">
-                      {recentProjects.map((project) => (
-                        <ProjectCard
-                          key={project.id}
-                          project={project}
-                          onSelect={() => setSelectedProject(project)}
+
+                    {isCreating && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border"
+                      >
+                        <input
+                          type="text"
+                          value={newProjectName}
+                          onChange={(e) => setNewProjectName(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && createProject()}
+                          placeholder="Nom du projet..."
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-afribolt-500 focus:border-transparent outline-none text-sm"
+                          autoFocus
                         />
-                      ))}
-                    </div>
+                        <button onClick={createProject} className="btn-primary text-sm px-4 py-2">
+                          Créer
+                        </button>
+                        <button
+                          onClick={() => { setIsCreating(false); setNewProjectName(""); }}
+                          className="text-gray-500 hover:text-gray-700 text-sm"
+                        >
+                          Annuler
+                        </button>
+                      </motion.div>
+                    )}
+
+                    {isLoading ? (
+                      <div className="flex justify-center py-8">
+                        <div className="w-6 h-6 border-2 border-afribolt-600 border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    ) : displayProjects.length > 0 ? (
+                      <div className="space-y-4">
+                        {displayProjects.map((project) => (
+                          <ProjectCard
+                            key={project.id}
+                            project={project}
+                            onSelect={() => setSelectedProject(project as any)}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        <p>Aucun projet. Cliquez sur &quot;Nouveau projet&quot; pour commencer.</p>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -247,7 +253,7 @@ export default function Dashboard() {
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-gray-900">Tous les agents</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {agents.map((agent) => (
+                      {DEMO_AGENTS.map((agent) => (
                         <AgentCard key={agent.name} agent={agent} />
                       ))}
                     </div>

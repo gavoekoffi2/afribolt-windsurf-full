@@ -41,6 +41,7 @@ export function Header() {
     { name: "Agents", href: "#agents" },
     { name: "Tarifs", href: "#pricing" },
     { name: "Dashboard", href: "/dashboard" },
+    ...(isLoggedIn ? [{ name: "Paramètres", href: "/dashboard/settings" }] : []),
   ];
 
   return (
