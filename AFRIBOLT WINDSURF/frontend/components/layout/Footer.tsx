@@ -13,25 +13,25 @@ const navigation = {
     { name: "Fonctionnalités", href: "#features" },
     { name: "Agents IA", href: "#agents" },
     { name: "Tarifs", href: "#pricing" },
-    { name: "API", href: "/docs/api" }
+    { name: "Dashboard", href: "/dashboard" }
   ],
   entreprise: [
-    { name: "À propos", href: "/about" },
-    { name: "Blog", href: "/blog" },
-    { name: "Carrières", href: "/careers" },
-    { name: "Presse", href: "/press" }
+    { name: "À propos", href: "#" },
+    { name: "Blog", href: "#" },
+    { name: "Carrières", href: "#" },
+    { name: "Contact", href: "mailto:contact@afribolt.com" }
   ],
   ressources: [
-    { name: "Documentation", href: "/docs" },
-    { name: "Guides", href: "/guides" },
-    { name: "Support", href: "/support" },
-    { name: "Status", href: "/status" }
+    { name: "Documentation", href: "#" },
+    { name: "Guides", href: "#" },
+    { name: "Support", href: "mailto:support@afribolt.com" },
+    { name: "Status", href: "#" }
   ],
   legal: [
-    { name: "Confidentialité", href: "/privacy" },
-    { name: "Conditions", href: "/terms" },
-    { name: "Sécurité", href: "/security" },
-    { name: "RGPD", href: "/gdpr" }
+    { name: "Confidentialité", href: "#" },
+    { name: "Conditions", href: "#" },
+    { name: "Sécurité", href: "#" },
+    { name: "RGPD", href: "#" }
   ]
 };
 
