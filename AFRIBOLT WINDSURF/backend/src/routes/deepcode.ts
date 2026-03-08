@@ -229,10 +229,18 @@ router.get("/status", authenticate, async (req: AuthRequest, res, next) => {
 // Batch analyze multiple files
 router.post("/batch-analyze", authenticate, validateDeepCode, async (req: AuthRequest, res, next) => {
   try {
-    const { files } = req.body; // Array of { name, code, context }
+    const { files } = req.body;
 
-    const results = await Promise.all(
-      files.map(async (file: any) => {
+    if (!Array.isArray(files) || files.length === 0) {
+      return res.status(400).json({ success: false, error: "files must be a non-empty array" });
+    }
+
+    if (files.length > 50) {
+      return res.status(400).json({ success: false, error: "Maximum 50 files per batch" });
+    }
+
+    const settled = await Promise.allSettled(
+      files.map(async (file: { name: string; code: string; context: Record<string, unknown> }) => {
         const analysis = await deepCodeEngine.analyzeCode(file.code, file.context);
         return {
           name: file.name,
@@ -243,12 +251,22 @@ router.post("/batch-analyze", authenticate, validateDeepCode, async (req: AuthRe
       })
     );
 
-    const overallScore = results.reduce((sum, result) => sum + result.score, 0) / results.length;
-    const allPassed = results.every(result => result.passed);
+    const results = settled.map((result, i) =>
+      result.status === "fulfilled"
+        ? result.value
+        : { name: files[i]?.name || `file-${i}`, analysis: null, passed: false, score: 0, error: result.reason?.message || "Analysis failed" }
+    );
+
+    const successfulResults = results.filter((r) => r.analysis !== null);
+    const overallScore = successfulResults.length > 0
+      ? successfulResults.reduce((sum, r) => sum + r.score, 0) / successfulResults.length
+      : 0;
+    const allPassed = successfulResults.length > 0 && successfulResults.every((r) => r.passed);
 
     logger.info("DeepCode batch analysis completed", {
       userId: req.user!.id,
       filesCount: files.length,
+      successCount: successfulResults.length,
       overallScore,
       allPassed,
     });
@@ -261,6 +279,7 @@ router.post("/batch-analyze", authenticate, validateDeepCode, async (req: AuthRe
           score: overallScore,
           passed: allPassed,
           filesCount: files.length,
+          successCount: successfulResults.length,
         },
       },
     });

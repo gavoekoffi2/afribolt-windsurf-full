@@ -37,7 +37,8 @@ const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 const io = new Server(server, {
   cors: {
     origin: frontendUrl,
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
   }
 });
 
@@ -88,8 +89,17 @@ io.use((socket, next) => {
 io.on("connection", (socket) => {
   logger.info(`Client connected: ${socket.id} (user: ${(socket as any).userId})`);
 
-  socket.on("join-project", (projectId: string) => {
-    socket.join(`project-${projectId}`);
+  socket.on("join-project", async (projectId: string) => {
+    const userId = (socket as any).userId;
+    const project = await prisma.project.findFirst({
+      where: { id: projectId, userId },
+      select: { id: true },
+    });
+    if (project) {
+      socket.join(`project-${projectId}`);
+    } else {
+      socket.emit("agent-error", { message: "Project not found or access denied" });
+    }
   });
 
   socket.on("agent-request", async (data) => {
